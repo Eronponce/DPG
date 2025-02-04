@@ -70,7 +70,14 @@ def test_base_sklearn(datasets, target_column, n_learners, perc_var, decimal_thr
     df: A pandas DataFrame containing node metrics.
     df_dpg: A pandas DataFrame containing DPG metrics.
     """
+    #create file to dump results
+    if file_name:
+        output_dir = os.path.dirname(file_name)
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir)
     
+    if save_plot_dir and not os.path.exists(save_plot_dir):
+        os.makedirs(save_plot_dir)
     # Load dataset
     data, features, target = select_custom_dataset(datasets, target_column=target_column)
     
@@ -96,11 +103,11 @@ def test_base_sklearn(datasets, target_column, n_learners, perc_var, decimal_thr
     
     if is_classifier(model):
         # Evaluate the model
+        # consider labels with 0 tests
         accuracy = accuracy_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted', zero_division=0)
         confusion = confusion_matrix(y_test, y_pred)
-        classification_rep = classification_report(y_test, y_pred)
-
+        classification_rep = classification_report(y_test, y_pred,zero_division=0)
         # Print or save the evaluation results
         if file_name is not None:
             with open(file_name, "w") as f:
